@@ -1,30 +1,67 @@
 
 public class RechnungsDruck {
-	
+	double gesamtBetrag;
     public static void druckeSeitenKopf(int seite){
         System.out.println("Seite: "+ seite);
+
+
     }
-    public static void druckeRechnungskopf(Kunde kunde, int bestellNr){
+    public static void druckeRechnungskopf(Kunde kunde, String bestellNr){
         String kd_nr = kunde.getKundenNr();
         String kd_name = kunde.getName();
         String adresse = kunde.getStrasse();
         String ort = kunde.getOrt();
-        String plz = kunde.getOrt();
+        String plz = kunde.getPLZ();
         
         System.out.println("Kundennummer: "+ kd_nr);
         System.out.println("Kundenname: "+ kd_name);
         System.out.println("Adresse: "+adresse+", "+plz+" "+ort);
+        System.out.println();
         
     }
 
 
     public static double rechnungsausgabe(Kunde kunde) {
-        
         double gesamtBetrag = 0.0;
-        // hier kommt noch etwas
-        return gesamtBetrag;
+        int seite = 1;
+        int zeilenZaehler = 0;
         
+        Bestellung[] bestellungen = kunde.getBestellungen();
+        druckeRechnungskopf(kunde, bestellungen[0].getBestellNr());
+        for (Bestellung bestellung : bestellungen) {
+            
+            
+            System.out.println("Rechnungsnummer: " + bestellung.getRechnung().getRechnungsNr());
+            System.out.println("Rechnungsdatum: " + bestellung.getRechnung().getRechnungsDatum());
+            druckeSeitenKopf(seite);
+            System.out.println("------------------------------");
+            System.out.println("PosNr  Artikel        Einzelpreis  Menge     Gesamtpreis");
+            System.out.println("------------------------------------------------------");
+            
+            Bestelltposition[] bestelltpositions = bestellung.getBestelltpositions();
+            for (Bestelltposition position : bestelltpositions) {
+                if (zeilenZaehler >= 20) {
+                    seite++;
+                    druckeSeitenKopf(seite);
+                    zeilenZaehler = 0;
+                }
+                
+                double betrag = position.getEinzelPreis() * position.getMenge();
+                gesamtBetrag += betrag;
+                
+                System.out.printf("%d      %-12s   %.2f        %d         %.2f\n", position.getPosNr(), position.getArtikel().getBezeichnung(), position.getEinzelPreis(), position.getMenge(), betrag);
+                zeilenZaehler++;
+            }
+            
+            System.out.println("------------------------------");
+            System.out.println("Gesamtbetrag: " + gesamtBetrag);
+            System.out.println();
+        }
+        
+        return gesamtBetrag;
     }
+    
+    
 }
  class Artikel {
  // hier kommt noch etwas
